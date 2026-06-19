@@ -92,6 +92,15 @@ thead th{
 .arrow.rotate{
     transform:rotate(-90deg);
 }
+button{
+    cursor:pointer;
+    padding:4px 8px;
+    margin:2px;
+}
+
+button:hover{
+    transform:scale(1.1);
+}
 </style>
 <style>
 .section-title{
@@ -133,15 +142,15 @@ tbody tr:hover{
     <div style="font-size:22px; font-weight:bold;">
         DAFTAR NOMINATIF PEKERJA
     </div>
-    <div style="margin-bottom:15px;text-align:right;">
-    <button onclick="tambahData()">
-        ➕ Tambah Personel
-    </button>
-</div>
         
     <div style="font-size:18px; font-weight:bold;">
         WILAYAH OPERASI 2.C TSM DAERAH OPERASI 2 BANDUNG
     </div>
+        <div style="margin-bottom:15px;text-align:right;">
+    <button onclick="tambahData()">
+        ➕ Tambah Personel
+    </button>
+</div>
 </div>
 
 <div class="section-title" onclick="toggleTable('ksTable')">
@@ -380,7 +389,10 @@ left:50%;
 transform:translate(-50%,-50%);
 background:white;
 padding:20px;
-border:1px solid black;
+width:700px;
+max-height:85vh;
+overflow:auto;
+border:1px solid #000;
 z-index:999;
 ">
 
@@ -394,12 +406,47 @@ z-index:999;
 
 <input id="kedudukan" placeholder="Kedudukan"><br><br>
 
+<label>Tgl Lahir</label><br>
+<input type="date" id="tglLahir"><br><br>
+
+<input id="domisili" placeholder="Domisili"><br><br>
+
+<label>TMT Masuk KAI</label><br>
+<input type="date" id="tmtMasukKai"><br><br>
+
+<label>TMT Penempatan</label><br>
+<input type="date" id="tmtPenempatan"><br><br>
+
+<input id="lamaPenempatan" placeholder="Lama Penempatan"><br><br>
+
+<input id="noSmartcard" placeholder="No Smartcard"><br><br>
+
+<label>Tgl Smartcard</label><br>
+<input type="date" id="tglSmartcard"><br><br>
+
+<input id="ketSmartcard" placeholder="Keterangan Smartcard"><br><br>
+
+<input id="noO50" placeholder="No O50"><br><br>
+
+<label>Tgl O50</label><br>
+<input type="date" id="tglO50"><br><br>
+
+<input id="mcu" placeholder="MCU"><br><br>
+
+<textarea
+id="keterangan"
+placeholder="Keterangan"
+style="width:100%;height:80px;">
+</textarea>
+
+<br><br>
+
 <button onclick="simpanData()">
-Simpan
+💾 Simpan
 </button>
 
 <button onclick="tutupForm()">
-Batal
+❌ Batal
 </button>
 
 </div>
@@ -457,11 +504,13 @@ function getStatusSmartCard(tglBerlaku){
 
 function getStatusPenempatan(lamaPenempatan){
 
-    if(!lamaPenempatan){
+    if(lamaPenempatan == null || lamaPenempatan == ""){
         return "";
     }
 
-    const match = lamaPenempatan.match(/(\d+)/);
+    const text = String(lamaPenempatan);
+
+    const match = text.match(/(\d+)/);
 
     if(!match){
         return "";
@@ -470,14 +519,14 @@ function getStatusPenempatan(lamaPenempatan){
     const tahun = parseInt(match[1]);
 
     if(tahun <= 2){
-        return "#92D050"; // Hijau
+        return "#92D050";
     }
 
     if(tahun <= 4){
-        return "#FFD966"; // Kuning
+        return "#FFD966";
     }
 
-    return "#FF6666"; // Merah
+    return "#FF6666";
 }
 fetch(SHEET_URL)
 .then(res => res.text())
@@ -543,13 +592,12 @@ ${smartcardStatus.text}
 <td>${row[14] || ""}</td>              <!-- MCU -->
 <td>${row[15] || ""}</td>              <!-- KETERANGAN -->
 <td>
-<button onclick='editData(
-"${row[0]}",
-"${row[1]}",
-"${row[2]}",
-"${row[3]}"
-)'>
-Edit
+<button onclick='editData(${JSON.stringify(row)})' title="Edit Data">
+✏️
+</button>
+
+<button onclick='hapusData("${row[2]}")' title="Hapus Data">
+🧽
 </button>
 </td>
             </tr>`;
@@ -587,13 +635,12 @@ ${smartcardStatus.text}
 <td>${row[14] || ""}</td>              <!-- MCU -->
 <td>${row[15] || ""}</td>              <!-- KETERANGAN -->
 <td>
-<button onclick='editData(
-"${row[0]}",
-"${row[1]}",
-"${row[2]}",
-"${row[3]}"
-)'>
-Edit
+<button onclick='editData(${JSON.stringify(row)})' title="Edit Data">
+✏️
+</button>
+
+<button onclick='hapusData("${row[2]}")' title="Hapus Data">
+🧽
 </button>
 </td>
             </tr>`;
@@ -630,13 +677,12 @@ ${smartcardStatus.text}
 <td>${row[14] || ""}</td>              <!-- MCU -->
 <td>${row[15] || ""}</td>              <!-- KETERANGAN -->
 <td>
-<button onclick='editData(
-"${row[0]}",
-"${row[1]}",
-"${row[2]}",
-"${row[3]}"
-)'>
-Edit
+<button onclick='editData(${JSON.stringify(row)})' title="Edit Data">
+✏️
+</button>
+
+<button onclick='hapusData("${row[2]}")' title="Hapus Data">
+🧽
 </button>
 </td>
             </tr>`;
@@ -673,13 +719,12 @@ ${smartcardStatus.text}
 <td>${row[14] || ""}</td>              <!-- MCU -->
 <td>${row[15] || ""}</td>              <!-- KETERANGAN -->
 <td>
-<button onclick='editData(
-"${row[0]}",
-"${row[1]}",
-"${row[2]}",
-"${row[3]}"
-)'>
-Edit
+<button onclick='editData(${JSON.stringify(row)})' title="Edit Data">
+✏️
+</button>
+
+<button onclick='hapusData("${row[2]}")' title="Hapus Data">
+🧽
 </button>
 </td>
             </tr>`;
@@ -717,13 +762,12 @@ ${smartcardStatus.text}
 <td>${row[14] || ""}</td>              <!-- MCU -->
 <td>${row[15] || ""}</td>              <!-- KETERANGAN -->
 <td>
-<button onclick='editData(
-"${row[0]}",
-"${row[1]}",
-"${row[2]}",
-"${row[3]}"
-)'>
-Edit
+<button onclick='editData(${JSON.stringify(row)})' title="Edit Data">
+✏️
+</button>
+
+<button onclick='hapusData("${row[2]}")' title="Hapus Data">
+🧽
 </button>
 </td>
             </tr>`;
@@ -760,13 +804,12 @@ ${smartcardStatus.text}
 <td>${row[14] || ""}</td>              <!-- MCU -->
 <td>${row[15] || ""}</td>              <!-- KETERANGAN -->
 <td>
-<button onclick='editData(
-"${row[0]}",
-"${row[1]}",
-"${row[2]}",
-"${row[3]}"
-)'>
-Edit
+<button onclick='editData(${JSON.stringify(row)})' title="Edit Data">
+✏️
+</button>
+
+<button onclick='hapusData("${row[2]}")' title="Hapus Data">
+🧽
 </button>
 </td>
             </tr>`;
@@ -802,13 +845,12 @@ Edit
 <td>${row[14] || ""}</td>              <!-- MCU -->
 <td>${row[15] || ""}</td>              <!-- KETERANGAN -->
 <td>
-<button onclick='editData(
-"${row[0]}",
-"${row[1]}",
-"${row[2]}",
-"${row[3]}"
-)'>
-Edit
+<button onclick='editData(${JSON.stringify(row)})' title="Edit Data">
+✏️
+</button>
+
+<button onclick='hapusData("${row[2]}")' title="Hapus Data">
+🧽
 </button>
 </td>
             </tr>`;
@@ -848,7 +890,7 @@ function toggleTable(id){
 }
 </script>
 <script>
-
+let nippLama = "";
 let mode = "tambah";
 
 function tambahData(){
@@ -863,16 +905,68 @@ function tambahData(){
     document.getElementById("kedudukan").value="";
 }
 
-function editData(jabatan,nama,nipp,kedudukan){
+function editData(row){
 
     mode = "edit";
+    nippLama = row[2];
 
     document.getElementById("popupForm").style.display="block";
 
-    document.getElementById("jabatan").value=jabatan;
-    document.getElementById("nama").value=nama;
-    document.getElementById("nipp").value=nipp;
-    document.getElementById("kedudukan").value=kedudukan;
+    document.getElementById("jabatan").value=row[0]||"";
+    document.getElementById("nama").value=row[1]||"";
+    document.getElementById("nipp").value=row[2]||"";
+    document.getElementById("kedudukan").value=row[3]||"";
+
+document.getElementById("tglLahir").value =
+    row[4] ? String(row[4]).substring(0,10) : "";
+   document.getElementById("domisili").value=row[5]||"";
+    document.getElementById("tmtMasukKai").value =
+    row[6] ? String(row[6]).substring(0,10) : "";
+    document.getElementById("tmtPenempatan").value =
+    row[7] ? String(row[7]).substring(0,10) : "";
+
+    document.getElementById("lamaPenempatan").value=row[8]||"";
+
+    document.getElementById("noSmartcard").value=row[9]||"";
+    document.getElementById("tglSmartcard").value =
+    row[10] ? String(row[10]).substring(0,10) : "";
+    document.getElementById("ketSmartcard").value=row[11]||"";
+
+    document.getElementById("noO50").value=row[12]||"";
+    document.getElementById("tglO50").value =
+    row[13] ? String(row[13]).substring(0,10) : "";
+
+    document.getElementById("mcu").value=row[14]||"";
+    document.getElementById("keterangan").value=row[15]||"";
+}
+function hapusData(nipp){
+
+    const konfirmasi = confirm(
+        "Yakin ingin menghapus data ini?"
+    );
+
+    if(!konfirmasi) return;
+
+    fetch(SHEET_URL,{
+        method:"POST",
+        body:JSON.stringify({
+            aksi:"hapus",
+            nipp:nipp
+        })
+    })
+    .then(r => r.text())
+    .then(res => {
+
+        alert("Data berhasil dihapus");
+
+        location.reload();
+
+    })
+    .catch(err => {
+
+        alert("Gagal menghapus data : " + err);
+
+    });
 }
 
 function tutupForm(){
@@ -880,20 +974,67 @@ function tutupForm(){
     document.getElementById("popupForm").style.display="none";
 }
 
+function hitungLamaPenempatan(tmtPenempatan){
 
+    if(!tmtPenempatan) return "";
+
+    const tmt = new Date(tmtPenempatan);
+    const sekarang = new Date();
+
+    let tahun = sekarang.getFullYear() - tmt.getFullYear();
+    let bulan = sekarang.getMonth() - tmt.getMonth();
+
+    if(bulan < 0){
+        tahun--;
+        bulan += 12;
+    }
+
+    return `${tahun} Tahun ${bulan} Bulan`;
+}
 function simpanData(){
 
 const data = {
 
 aksi: mode,
+nippLama: nippLama,
+
 jabatan: document.getElementById("jabatan").value,
 nama: document.getElementById("nama").value,
 nipp: document.getElementById("nipp").value,
-kedudukan: document.getElementById("kedudukan").value
+kedudukan: document.getElementById("kedudukan").value,
 
+tglLahir: document.getElementById("tglLahir").value,
+domisili: document.getElementById("domisili").value,
+
+tmtMasukKai: document.getElementById("tmtMasukKai").value,
+tmtPenempatan: document.getElementById("tmtPenempatan").value,
+
+lamaPenempatan:
+hitungLamaPenempatan(
+document.getElementById("tmtPenempatan").value
+),
+
+noSmartcard:
+document.getElementById("noSmartcard").value,
+
+tglSmartcard:
+document.getElementById("tglSmartcard").value,
+
+ketSmartcard:
+document.getElementById("ketSmartcard").value,
+
+noO50:
+document.getElementById("noO50").value,
+
+tglO50:
+document.getElementById("tglO50").value,
+
+mcu:
+document.getElementById("mcu").value,
+
+keterangan:
+document.getElementById("keterangan").value
 };
-
-console.log(data);
 
 fetch(SHEET_URL,{
 method:"POST",
@@ -902,8 +1043,6 @@ body:JSON.stringify(data)
 .then(r=>r.text())
 .then(res=>{
 
-console.log(res);
-
 alert("Data berhasil disimpan");
 
 location.reload();
@@ -911,9 +1050,7 @@ location.reload();
 })
 .catch(err=>{
 
-console.error(err);
-
-alert("ERROR : "+err);
+alert("Error : "+err);
 
 });
 
