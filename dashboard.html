@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Personel Stasiun</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+    font-family:Arial;
+    background:#f4f7fb;
+    margin:20px;
+}
+
+h2{
+    text-align:center;
+}
+
+.container{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+canvas{
+    max-height:300px;
+}
+</style>
+</head>
+
+<body>
+<div id="popupDetail" style="
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:15px;
+width:400px;
+max-height:70vh;
+overflow:auto;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+z-index:999;
+">
+    <h3 id="judulPopup">Detail</h3>
+    <div id="isiPopup"></div>
+
+    <button onclick="tutupPopup()" style="margin-top:10px;padding:8px 12px;">
+        Tutup
+    </button>
+</div>
+
+<h2>📊 DASHBOARD LAMA PENEMPATAN PERSONEL</h2>
+
+<div class="container">
+
+    <div class="card">
+        <h3>KS</h3>
+        <canvas id="chartKS"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>PPKA</h3>
+        <canvas id="chartPPKA"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>PJL</h3>
+        <canvas id="chartPJL"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>PELAKSANA</h3>
+        <canvas id="chartPEL"></canvas>
+    </div>
+
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbx22kY0cN65Ad4E8BBANMj7bhvYEgsk9ZtsK9nHll9n7oWjed8_1QRQvrw5BffgurCc/exec";
+
+let detail = {
+    KS:{aman:[],waspada:[],kritis:[]},
+    PPKA:{aman:[],waspada:[],kritis:[]},
+    PJL:{aman:[],waspada:[],kritis:[]},
+    PELAKSANA:{aman:[],waspada:[],kritis:[]}
+};
+
+function hitungKategori(lama){
+    const angka = parseInt(lama);
+
+    if(isNaN(angka)) return "unknown";
+    if(angka <= 2) return "aman";
+    if(angka <= 4) return "waspada";
+    return "kritis";
+}
+
+fetch(SHEET_URL)
+.then(res => res.text())
+.then(txt => {
+
+    const data = JSON.parse(txt);
+
+    let stat = {
+        KS:{aman:0,waspada:0,kritis:0},
+        PPKA:{aman:0,waspada:0,kritis:0},
+        PJL:{aman:0,waspada:0,kritis:0},
+        PELAKSANA:{aman:0,waspada:0,kritis:0}
+    };
+
+    // reset detail
+    Object.keys(detail).forEach(k => {
+        detail[k] = {aman:[],waspada:[],kritis:[]};
+    });
+
+    data.slice(1).forEach(r => {
+
+        const jabatan = (r[0] || "").toUpperCase();
+        const nama = r[1] || "";
+        const lama = r[8] || "0";
+
+        const kategori = hitungKategori(lama);
+
+        if(stat[jabatan]){
+            stat[jabatan][kategori]++;
+
+            // 🔥 SIMPAN NAMA + LAMA
+            detail[jabatan][kategori].push({
+                nama: nama,
+                lama: lama
+            });
+        }
+    });
+
+    buatChart("chartKS", stat.KS, "KS");
+    buatChart("chartPPKA", stat.PPKA, "PPKA");
+    buatChart("chartPJL", stat.PJL, "PJL");
+    buatChart("chartPEL", stat.PELAKSANA, "PELAKSANA");
+
+});
+
+function buatChart(id, data, jabatan){
+
+    new Chart(document.getElementById(id), {
+        type: 'doughnut',
+        data: {
+            labels: ["Aman (≤2)", "Waspada (2–4)", "Kritis (>4)"],
+            datasets: [{
+                data: [data.aman, data.waspada, data.kritis],
+                backgroundColor: ["#92d050","#ffd966","#ff4d4d"]
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{
+                legend:{position:'bottom'}
+            },
+            onClick:(evt, elements) => {
+
+                if(elements.length === 0) return;
+
+                const index = elements[0].index;
+
+                let kategori = "";
+                if(index === 0) kategori = "aman";
+                if(index === 1) kategori = "waspada";
+                if(index === 2) kategori = "kritis";
+
+                tampilkanDetail(jabatan, kategori);
+            }
+        }
+    });
+}
+
+function tampilkanDetail(jabatan, kategori){
+
+    const data = detail[jabatan][kategori];
+
+    document.getElementById("judulPopup").innerText =
+        jabatan + " - " + kategori.toUpperCase();
+
+    let html = "<ul style='padding-left:18px;'>";
+
+    if(data.length === 0){
+        html += "<li>Tidak ada data</li>";
+    } else {
+
+        data.forEach(item => {
+
+            html += `
+                <li style="margin-bottom:6px;">
+                    <b>${item.nama}</b> - 
+                    <span style="color:#555;">
+                        ${item.lama}
+                    </span>
+                </li>
+            `;
+        });
+    }
+
+    html += "</ul>";
+
+    document.getElementById("isiPopup").innerHTML = html;
+    document.getElementById("popupDetail").style.display = "block";
+}
+
+function tutupPopup(){
+    document.getElementById("popupDetail").style.display = "none";
+}
+</script>
+
+</body>
+</html>
