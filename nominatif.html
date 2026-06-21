@@ -6,8 +6,20 @@
 <title>Data Personel Stasiun</title>
 
 <style>
+    :root{
+    --kai-blue:#004b8d;
+    --kai-blue-light:#0f6cbf;
+    --kai-orange:#f58220;
+    --kai-bg:#f4f7fb;
+    --kai-card:#ffffff;
+    --kai-border:#dbe4ee;
+    --kai-text:#243447;
+}
+
 body{
-    font-family: Arial, sans-serif;
+    font-family:'Segoe UI',Tahoma,sans-serif;
+    background:var(--kai-bg);
+    color:var(--kai-text);
     margin:20px;
 }
 
@@ -23,17 +35,23 @@ body{
 table{
     width:100%;
     border-collapse:collapse;
-    margin-bottom:20px;
-    font-size:12px;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    margin-bottom:25px;
 }
 
-th, td{
-    border:1px solid #000;
-    padding:4px;
-    text-align:center;
-    vertical-align:middle;
+thead th{
+    background:#004b8d;
+    color:white;
+    padding:10px;
+    border:1px solid #d6e0eb;
 }
-
+td{
+    padding:8px;
+    border:1px solid #e4e8ec;
+}
 th{
     background:#d9eaf7;
 }
@@ -93,24 +111,89 @@ thead th{
     transform:rotate(-90deg);
 }
 button{
+    border:none;
+    border-radius:8px;
+    padding:8px 14px;
+    font-weight:600;
     cursor:pointer;
-    padding:4px 8px;
-    margin:2px;
+    transition:.25s;
+}
+.btn-tambah{
+    margin-top:15px;
+    background:linear-gradient(135deg, #f58220, #ff9a3c);
+    color:white;
+    padding:10px 18px;
+    border:none;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    transition:0.25s ease;
 }
 
-button:hover{
-    transform:scale(1.1);
+.btn-tambah:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    background:linear-gradient(135deg, #e26f0d, #ff8a1f);
+}
+
+.btn-tambah:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    background:linear-gradient(135deg, #e26f0d, #ff8a1f);
+}
+#popupForm{
+    border:none !important;
+    border-radius:15px;
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
+}
+input,
+select,
+textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #d8dee6;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#0f6cbf;
+    outline:none;
+    box-shadow:0 0 0 3px rgba(15,108,191,.15);
+}
+/* tombol edit */
+button[title="Edit Data"]:hover{
+    background-color:#0f6cbf;
+    color:white;
+    transform:scale(1.15);
+    box-shadow:0 4px 10px rgba(0,75,141,0.3);
+}
+
+/* tombol hapus */
+button[title="Hapus Data"]:hover{
+    background-color:#ff4d4d;
+    color:white;
+    transform:scale(1.15);
+    box-shadow:0 4px 10px rgba(255,0,0,0.3);
 }
 </style>
 <style>
 .section-title{
-    background:#1f4e78;
+    background:linear-gradient(
+        90deg,
+        #004b8d,
+        #0f6cbf
+    );
     color:white;
-    text-align:center;
-    font-weight:bold;
-    padding:8px;
-    margin-top:20px;
-    cursor:pointer;
+    border-radius:10px;
+    padding:12px;
+    margin-top:18px;
+    font-size:15px;
+    font-weight:700;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
 
 .hidden{
@@ -133,7 +216,29 @@ tbody tr:hover{
     transition:0.2s;
 }
 
+.header-kai{
+    background:linear-gradient(
+        135deg,
+        #004b8d,
+        #0f6cbf
+    );
+    color:white;
+    padding:25px;
+    border-radius:15px;
+    margin-bottom:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,.15);
+    text-align:center;
+}
 
+.header-title{
+    font-size:28px;
+    font-weight:700;
+}
+
+.header-subtitle{
+    font-size:15px;
+    opacity:.95;
+}
 
 </style>
 </head>
@@ -146,11 +251,34 @@ tbody tr:hover{
     <div style="font-size:18px; font-weight:bold;">
         WILAYAH OPERASI 2.C TSM DAERAH OPERASI 2 BANDUNG
     </div>
-        <div style="margin-bottom:15px;text-align:right;">
-    <button onclick="tambahData()">
-        ➕ Tambah Personel
+    <div style="margin:10px auto;text-align:center;">
+    <input 
+        id="searchInput"
+placeholder="🔍 Cari: Nama / NIPP / Kedudukan"
+        style="padding:10px;width:320px;border-radius:8px;border:1px solid #ccc;"
+        onkeyup="searchTable()"
+    >
+
+    <button onclick="searchTable()" style="padding:10px 14px;border-radius:8px;background:#004b8d;color:white;">
+        Cari
+    </button>
+
+    <button onclick="resetSearch()" style="padding:10px 14px;border-radius:8px;">
+        Reset
     </button>
 </div>
+<div style="margin-bottom:15px;text-align:right;">
+    <button class="btn-tambah" onclick="tambahData()">
+        ➕ Tambah Personel
+    </button>
+
+<a href="dashboard.html" target="_blank">
+    <button class="btn-tambah">
+        📊 Lihat Dashboard
+    </button>
+</a>
+</div>
+
 </div>
 
 <div class="section-title" onclick="toggleTable('ksTable')">
@@ -299,7 +427,7 @@ tbody tr:hover{
     <th rowspan="2">TMT Penempatan di Stasiun</th>
     <th rowspan="2">Lama Penempatan di Stasiun</th>
     <th colspan="3">SMART CARD / SERTIFIKAT DJKA</th>
-    <th colspan="2">KECAKAPAN O.50</th>
+    <th colspan="2">KECAKAPAN PJL</th>
     <th rowspan="2">HASIL MCU</th>
 <th rowspan="2">KETERANGAN</th>
 <th rowspan="2">AKSI</th></tr>
@@ -332,7 +460,7 @@ tbody tr:hover{
     <th rowspan="2">TMT Penempatan di Stasiun</th>
     <th rowspan="2">Lama Penempatan di Stasiun</th>
     <th colspan="3">SMART CARD / SERTIFIKAT DJKA</th>
-    <th colspan="2">KECAKAPAN O.50</th>
+    <th colspan="2">KECAKAPAN PLR</th>
     <th rowspan="2">HASIL MCU</th>
 <th rowspan="2">KETERANGAN</th>
 <th rowspan="2">AKSI</th></tr>
@@ -364,7 +492,7 @@ tbody tr:hover{
     <th rowspan="2">TMT Penempatan di Stasiun</th>
     <th rowspan="2">Lama Penempatan di Stasiun</th>
     <th colspan="3">SMART CARD / SERTIFIKAT DJKA</th>
-    <th colspan="2">KECAKAPAN O.50</th>
+    <th colspan="2">KECAKAPAN </th>
     <th rowspan="2">HASIL MCU</th>
 <th rowspan="2">KETERANGAN</th>
 <th rowspan="2">AKSI</th></tr>
@@ -396,16 +524,43 @@ border:1px solid #000;
 z-index:999;
 ">
 
-<h3>Data Personel</h3>
+<h3>Tambah Data Personel</h3>
 
-<input id="jabatan" placeholder="Jabatan"><br><br>
-
+<label>Jabatan</label><br>
+<select id="jabatan" style="width:100%;padding:5px;">
+    <option value="">-- Pilih Jabatan --</option>
+    <option value="KS">KS</option>
+    <option value="WKS">WKS</option>
+    <option value="BURKA">BURKA</option>
+    <option value="PPKA">PPKA</option>
+    <option value="PJL">PJL</option>
+    <option value="PLR">PLR</option>
+    <option value="PELAKSANA">PELAKSANA</option>
+</select>
+<br><br>
 <input id="nama" placeholder="Nama"><br><br>
 
 <input id="nipp" placeholder="NIPP"><br><br>
 
-<input id="kedudukan" placeholder="Kedudukan"><br><br>
-
+<label>Kedudukan</label><br>
+<select id="kedudukan" style="width:100%;padding:5px;">
+    <option value="">-- Pilih Kedudukan --</option>
+    <option value="WB">WB</option>
+    <option value="BMW">BMW</option>
+    <option value="CPD">CPD</option>
+    <option value="CAA">CAA</option>
+    <option value="CAW">CAW</option>
+    <option value="RJP">RJP</option>
+    <option value="IH">IH</option>
+    <option value="TSM">TSM</option>
+    <option value="AW">AW</option>
+    <option value="MNJ">MNJ</option>
+    <option value="CI">CI</option>
+    <option value="BJG">BJG</option>
+    <option value="KNP">KNP</option>
+    <option value="BJR">BJR</option>
+</select>
+<br><br>
 <label>Tgl Lahir</label><br>
 <input type="date" id="tglLahir"><br><br>
 
@@ -417,14 +572,12 @@ z-index:999;
 <label>TMT Penempatan</label><br>
 <input type="date" id="tmtPenempatan"><br><br>
 
-<input id="lamaPenempatan" placeholder="Lama Penempatan"><br><br>
 
 <input id="noSmartcard" placeholder="No Smartcard"><br><br>
 
 <label>Tgl Smartcard</label><br>
 <input type="date" id="tglSmartcard"><br><br>
 
-<input id="ketSmartcard" placeholder="Keterangan Smartcard"><br><br>
 
 <input id="noO50" placeholder="No O50"><br><br>
 
@@ -576,7 +729,7 @@ fetch(SHEET_URL)
 <td>${formatTanggal(row[6])}</td>
 <td>${formatTanggal(row[7])}</td>
         <td style="background:${warnaPenempatan};font-weight:bold;">
-            ${row[8] || ""}
+${hitungLamaPenempatan(row[7])}
         </td>
         <td>${row[9] || ""}</td>               <!-- NO SMARTCARD -->
 <td>${formatTanggal(row[10])}</td>     <!-- TGL BERLAKU SMARTCARD -->
@@ -619,7 +772,7 @@ ${smartcardStatus.text}
 <td>${formatTanggal(row[6])}</td>
 <td>${formatTanggal(row[7])}</td>
         <td style="background:${warnaPenempatan};font-weight:bold;">
-            ${row[8] || ""}
+${hitungLamaPenempatan(row[7])}
         </td>
         <td>${row[9] || ""}</td>               <!-- NO SMARTCARD -->
 <td>${formatTanggal(row[10])}</td>     <!-- TGL BERLAKU SMARTCARD -->
@@ -661,7 +814,7 @@ ${smartcardStatus.text}
 <td>${formatTanggal(row[6])}</td>
 <td>${formatTanggal(row[7])}</td>
         <td style="background:${warnaPenempatan};font-weight:bold;">
-            ${row[8] || ""}
+${hitungLamaPenempatan(row[7])}
         </td>
         <td>${row[9] || ""}</td>               <!-- NO SMARTCARD -->
 <td>${formatTanggal(row[10])}</td>     <!-- TGL BERLAKU SMARTCARD -->
@@ -703,7 +856,7 @@ ${smartcardStatus.text}
 <td>${formatTanggal(row[6])}</td>
 <td>${formatTanggal(row[7])}</td>
         <td style="background:${warnaPenempatan};font-weight:bold;">
-            ${row[8] || ""}
+${hitungLamaPenempatan(row[7])}
         </td>
         <td>${row[9] || ""}</td>               <!-- NO SMARTCARD -->
 <td>${formatTanggal(row[10])}</td>     <!-- TGL BERLAKU SMARTCARD -->
@@ -746,7 +899,7 @@ ${smartcardStatus.text}
 <td>${formatTanggal(row[6])}</td>
 <td>${formatTanggal(row[7])}</td>
         <td style="background:${warnaPenempatan};font-weight:bold;">
-            ${row[8] || ""}
+${hitungLamaPenempatan(row[7])}
         </td>
         <td>${row[9] || ""}</td>               <!-- NO SMARTCARD -->
 <td>${formatTanggal(row[10])}</td>     <!-- TGL BERLAKU SMARTCARD -->
@@ -788,7 +941,7 @@ ${smartcardStatus.text}
 <td>${formatTanggal(row[6])}</td>
 <td>${formatTanggal(row[7])}</td>
         <td style="background:${warnaPenempatan};font-weight:bold;">
-            ${row[8] || ""}
+${hitungLamaPenempatan(row[7])}
         </td>
         <td>${row[9] || ""}</td>               <!-- NO SMARTCARD -->
 <td>${formatTanggal(row[10])}</td>     <!-- TGL BERLAKU SMARTCARD -->
@@ -833,7 +986,7 @@ ${smartcardStatus.text}
 <td>${formatTanggal(row[6])}</td>
 <td>${formatTanggal(row[7])}</td>
         <td style="background:${warnaPenempatan};font-weight:bold;">
-            ${row[8] || ""}
+${hitungLamaPenempatan(row[7])}
         </td>
         <td>${row[9] || ""}</td>               <!-- NO SMARTCARD -->
 <td>${formatTanggal(row[10])}</td>     <!-- TGL BERLAKU SMARTCARD -->
@@ -925,12 +1078,10 @@ document.getElementById("tglLahir").value =
     document.getElementById("tmtPenempatan").value =
     row[7] ? String(row[7]).substring(0,10) : "";
 
-    document.getElementById("lamaPenempatan").value=row[8]||"";
 
     document.getElementById("noSmartcard").value=row[9]||"";
     document.getElementById("tglSmartcard").value =
     row[10] ? String(row[10]).substring(0,10) : "";
-    document.getElementById("ketSmartcard").value=row[11]||"";
 
     document.getElementById("noO50").value=row[12]||"";
     document.getElementById("tglO50").value =
@@ -954,19 +1105,18 @@ function hapusData(nipp){
             nipp:nipp
         })
     })
-    .then(r => r.text())
-    .then(res => {
+.then(r => r.text())
+.then(res => {
 
-        alert("Data berhasil dihapus");
+    console.log("RESPON SERVER:",res);
 
+    alert(res);
+
+    if(res === "success"){
         location.reload();
+    }
 
-    })
-    .catch(err => {
-
-        alert("Gagal menghapus data : " + err);
-
-    });
+})
 }
 
 function tutupForm(){
@@ -1020,8 +1170,7 @@ document.getElementById("noSmartcard").value,
 tglSmartcard:
 document.getElementById("tglSmartcard").value,
 
-ketSmartcard:
-document.getElementById("ketSmartcard").value,
+ketSmartcard: "",
 
 noO50:
 document.getElementById("noO50").value,
@@ -1036,6 +1185,8 @@ keterangan:
 document.getElementById("keterangan").value
 };
 
+console.log(data);
+
 fetch(SHEET_URL,{
 method:"POST",
 body:JSON.stringify(data)
@@ -1043,9 +1194,13 @@ body:JSON.stringify(data)
 .then(r=>r.text())
 .then(res=>{
 
-alert("Data berhasil disimpan");
+console.log("RESPON SERVER:",res);
 
-location.reload();
+alert(res);
+
+if(res === "success"){
+    location.reload();
+}
 
 })
 .catch(err=>{
@@ -1054,6 +1209,62 @@ alert("Error : "+err);
 
 });
 
+}
+
+function searchTable() {
+    const keyword = document.getElementById("searchInput").value.toLowerCase();
+
+    const semuaTabel = [
+        "ksData",
+        "wksData",
+        "burkaData",
+        "ppkaData",
+        "pjlData",
+        "plrData",
+        "pelaksanaData"
+    ];
+
+    semuaTabel.forEach(id => {
+        const rows = document.getElementById(id).getElementsByTagName("tr");
+
+        for (let row of rows) {
+
+            const nama = row.cells[1]?.innerText.toLowerCase() || "";
+            const nipp = row.cells[2]?.innerText.toLowerCase() || "";
+            const kedudukan = row.cells[3]?.innerText.toLowerCase() || ""; // ✅ TAMBAHAN
+
+            if (
+                nama.includes(keyword) ||
+                nipp.includes(keyword) ||
+                kedudukan.includes(keyword)   // ✅ TAMBAHAN
+            ) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        }
+    });
+}
+function resetSearch() {
+    document.getElementById("searchInput").value = "";
+
+    const semuaTabel = [
+        "ksData",
+        "wksData",
+        "burkaData",
+        "ppkaData",
+        "pjlData",
+        "plrData",
+        "pelaksanaData"
+    ];
+
+    semuaTabel.forEach(id => {
+        const rows = document.getElementById(id).getElementsByTagName("tr");
+
+        for (let row of rows) {
+            row.style.display = "";
+        }
+    });
 }
 </script>
 
